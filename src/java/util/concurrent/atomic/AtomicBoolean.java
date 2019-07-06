@@ -34,18 +34,19 @@
  */
 
 package java.util.concurrent.atomic;
+
 import sun.misc.Unsafe;
 
 /**
- * A {@code boolean} value that may be updated atomically. See the
- * {@link java.util.concurrent.atomic} package specification for
- * description of the properties of atomic variables. An
- * {@code AtomicBoolean} is used in applications such as atomically
- * updated flags, and cannot be used as a replacement for a
- * {@link java.lang.Boolean}.
+ * A {@code boolean} value that may be updated atomically.
+ * <p>原子更新一个boolean值</p>
+ * See the {@link java.util.concurrent.atomic} package specification for description of the properties of atomic variables.
+ * <p>参见原子变量属性描述的atomic包规范</p>
+ * An {@code AtomicBoolean} is used in applications such as atomically updated flags, and cannot be used as a replacement for a {@link java.lang.Boolean}.
+ * <p>AtomicBoolean在应用中使用,如原子更新标记,并且不能用boolean替换</p>
  *
- * @since 1.5
  * @author Doug Lea
+ * @since 1.5
  */
 public class AtomicBoolean implements java.io.Serializable {
     private static final long serialVersionUID = 4654671469794556979L;
@@ -56,8 +57,10 @@ public class AtomicBoolean implements java.io.Serializable {
     static {
         try {
             valueOffset = unsafe.objectFieldOffset
-                (AtomicBoolean.class.getDeclaredField("value"));
-        } catch (Exception ex) { throw new Error(ex); }
+                    (AtomicBoolean.class.getDeclaredField("value"));
+        } catch (Exception ex) {
+            throw new Error(ex);
+        }
     }
 
     private volatile int value;
@@ -155,6 +158,7 @@ public class AtomicBoolean implements java.io.Serializable {
 
     /**
      * Returns the String representation of the current value.
+     *
      * @return the String representation of the current value
      */
     public String toString() {

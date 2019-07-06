@@ -62,10 +62,12 @@ public class DefaultSelectorProvider {
     public static SelectorProvider create() {
         String osname = AccessController
             .doPrivileged(new GetPropertyAction("os.name"));
-        if (osname.equals("SunOS"))
+        if (osname.equals("SunOS")) {
             return createProvider("sun.nio.ch.DevPollSelectorProvider");
-        if (osname.equals("Linux"))
+        }
+        if (osname.equals("Linux")) {
             return createProvider("sun.nio.ch.EPollSelectorProvider");
+        }
         return new sun.nio.ch.PollSelectorProvider();
     }
 

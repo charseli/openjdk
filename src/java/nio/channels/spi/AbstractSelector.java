@@ -25,26 +25,26 @@
 
 package java.nio.channels.spi;
 
+import sun.nio.ch.Interruptible;
+
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.HashSet;
 import java.util.Set;
-import sun.nio.ch.Interruptible;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
  * Base implementation class for selectors.
+ * selectors基本实现类
  *
- * <p> This class encapsulates the low-level machinery required to implement
- * the interruption of selection operations.  A concrete selector class must
- * invoke the {@link #begin begin} and {@link #end end} methods before and
- * after, respectively, invoking an I/O operation that might block
- * indefinitely.  In order to ensure that the {@link #end end} method is always
- * invoked, these methods should be used within a
- * <tt>try</tt>&nbsp;...&nbsp;<tt>finally</tt> block:
- *
+ * <p> This class encapsulates the low-level machinery required to implement the interruption of selection operations.
+ * <p>该类封装实现选择操作中断的底层机制</p>
+ * A concrete selector class must invoke the {@link #begin begin} and {@link #end end} methods before and after, respectively, invoking an I/O operation that might block indefinitely.
+ * <p>selector的具体实现类必须先后分别调用begin()和end()方法,调用可能无限期阻塞的I/O操作</p>
+ * In order to ensure that the {@link #end end} method is always invoked, these methods should be used within a <tt>try</tt>&nbsp;...&nbsp;<tt>finally</tt> block:
+ * <p>为了确保end()方法被调用,这些方法应该使用try{}catch(){}finally{}方法块.</p>
  * <blockquote><pre>
  * try {
  *     begin();
@@ -54,21 +54,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *     end();
  * }</pre></blockquote>
  *
- * <p> This class also defines methods for maintaining a selector's
- * cancelled-key set and for removing a key from its channel's key set, and
- * declares the abstract {@link #register register} method that is invoked by a
- * selectable channel's {@link AbstractSelectableChannel#register register}
- * method in order to perform the actual work of registering a channel.  </p>
- *
- *
+ * <p> This class also defines methods for maintaining a selector's cancelled-key set and for removing a key from its channel's key set, and declares the abstract {@link #register register} method that is invoked by a selectable channel's {@link AbstractSelectableChannel#register register} method in order to perform the actual work of registering a channel.  </p>
+ * <p>该类还定义了包含selector的cancelled-key集合、从其channel对应的键集中移除key,声明被channel的register()方法调用抽象方法,以便执行正真注册channel的工作</p>
  * @author Mark Reinhold
  * @author JSR-51 Expert Group
  * @since 1.4
  */
 
 public abstract class AbstractSelector
-    extends Selector
-{
+        extends Selector {
 
     private AtomicBoolean selectorOpen = new AtomicBoolean(true);
 
@@ -78,8 +72,7 @@ public abstract class AbstractSelector
     /**
      * Initializes a new instance of this class.
      *
-     * @param  provider
-     *         The provider that created this selector
+     * @param provider The provider that created this selector
      */
     protected AbstractSelector(SelectorProvider provider) {
         this.provider = provider;
@@ -101,8 +94,7 @@ public abstract class AbstractSelector
      * the {@link #implCloseSelector implCloseSelector} method in order to
      * complete the close operation.  </p>
      *
-     * @throws  IOException
-     *          If an I/O error occurs
+     * @throws IOException If an I/O error occurs
      */
     public final void close() throws IOException {
         boolean open = selectorOpen.getAndSet(false);
@@ -124,8 +116,7 @@ public abstract class AbstractSelector
      * immediately as if by invoking the {@link
      * java.nio.channels.Selector#wakeup wakeup} method. </p>
      *
-     * @throws  IOException
-     *          If an I/O error occurs while closing the selector
+     * @throws IOException If an I/O error occurs while closing the selector
      */
     protected abstract void implCloseSelector() throws IOException;
 
@@ -136,7 +127,7 @@ public abstract class AbstractSelector
     /**
      * Returns the provider that created this channel.
      *
-     * @return  The provider that created this channel
+     * @return The provider that created this channel
      */
     public final SelectorProvider provider() {
         return provider;
@@ -147,7 +138,7 @@ public abstract class AbstractSelector
      *
      * <p> This set should only be used while synchronized upon it.  </p>
      *
-     * @return  The cancelled-key set
+     * @return The cancelled-key set
      */
     protected final Set<SelectionKey> cancelledKeys() {
         return cancelledKeys;
@@ -160,17 +151,11 @@ public abstract class AbstractSelector
      * AbstractSelectableChannel#register register} method in order to perform
      * the actual work of registering the channel with this selector.  </p>
      *
-     * @param  ch
-     *         The channel to be registered
-     *
-     * @param  ops
-     *         The initial interest set, which must be valid
-     *
-     * @param  att
-     *         The initial attachment for the resulting key
-     *
-     * @return  A new key representing the registration of the given channel
-     *          with this selector
+     * @param ch  The channel to be registered
+     * @param ops The initial interest set, which must be valid
+     * @param att The initial attachment for the resulting key
+     * @return A new key representing the registration of the given channel
+     * with this selector
      */
     protected abstract SelectionKey register(AbstractSelectableChannel ch,
                                              int ops, Object att);
@@ -181,11 +166,10 @@ public abstract class AbstractSelector
      * <p> This method must be invoked by the selector for each channel that it
      * deregisters.  </p>
      *
-     * @param  key
-     *         The selection key to be removed
+     * @param key The selection key to be removed
      */
     protected final void deregister(AbstractSelectionKey key) {
-        ((AbstractSelectableChannel)key.channel()).removeKey(key);
+        ((AbstractSelectableChannel) key.channel()).removeKey(key);
     }
 
 
@@ -209,9 +193,10 @@ public abstract class AbstractSelector
     protected final void begin() {
         if (interruptor == null) {
             interruptor = new Interruptible() {
-                    public void interrupt(Thread ignore) {
-                        AbstractSelector.this.wakeup();
-                    }};
+                public void interrupt(Thread ignore) {
+                    AbstractSelector.this.wakeup();
+                }
+            };
         }
         AbstractInterruptibleChannel.blockedOn(interruptor);
         Thread me = Thread.currentThread();

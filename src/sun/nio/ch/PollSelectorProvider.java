@@ -32,10 +32,12 @@ import java.nio.channels.spi.*;
 public class PollSelectorProvider
     extends SelectorProviderImpl
 {
+    @Override
     public AbstractSelector openSelector() throws IOException {
         return new PollSelectorImpl(this);
     }
 
+    @Override
     public Channel inheritedChannel() throws IOException {
         return InheritedChannel.getChannel();
     }
