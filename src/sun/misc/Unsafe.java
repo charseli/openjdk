@@ -34,8 +34,9 @@ import sun.reflect.Reflection;
 
 /**
  * A collection of methods for performing low-level, unsafe operations.
- * Although the class and all methods are public, use of this class is
- * limited because only trusted code can obtain instances of it.
+ * 用于执行底层、不安全操作方法的集合
+ * Although the class and all methods are public, use of this class is limited because only trusted code can obtain instances of it.
+ * 虽然该类和所有方法是public,使用该类是被限制的,只有受信任的代码可包含其实例
  *
  * @author John R. Rose
  * @see #getUnsafe
@@ -54,18 +55,20 @@ public final class Unsafe {
     private static final Unsafe theUnsafe = new Unsafe();
 
     /**
-     * Provides the caller with the capability of performing unsafe
-     * operations.
+     * Provides the caller with the capability of performing unsafe operations.
+     * 提供调用这拥有执行平台不安全操作的能力.
      *
      * <p> The returned <code>Unsafe</code> object should be carefully guarded
      * by the caller, since it can be used to read and write data at arbitrary
      * memory addresses.  It must never be passed to untrusted code.
+     * <p>返回的Unsafe对象应当被调用者小心监控,它可以在任意内存地址读写数据.不允许传递给不信任的代码</p>
      *
      * <p> Most methods in this class are very low-level, and correspond to a
      * small number of hardware instructions (on typical machines).  Compilers
      * are encouraged to optimize these methods accordingly.
-     *
+     *<p>在该类中的大部分方法比较底层,对应硬件指令数少,编译器鼓励优化这些方法</p>
      * <p> Here is a suggested idiom for using unsafe operations:
+     * <p>这里有些使用不安全操作的建议习惯</p>
      *
      * <blockquote><pre>
      * class MyTrustedClass {
@@ -78,6 +81,7 @@ public final class Unsafe {
      *
      * (It may assist compilers to make the local variable be
      * <code>final</code>.)
+     * 可辅助编译器将局部变量设置为final
      *
      * @exception  SecurityException  if a security manager exists and its
      *             <code>checkPropertiesAccess</code> method doesn't allow
@@ -86,8 +90,9 @@ public final class Unsafe {
     @CallerSensitive
     public static Unsafe getUnsafe() {
         Class<?> caller = Reflection.getCallerClass();
-        if (!VM.isSystemDomainLoader(caller.getClassLoader()))
+        if (!VM.isSystemDomainLoader(caller.getClassLoader())) {
             throw new SecurityException("Unsafe");
+        }
         return theUnsafe;
     }
 
@@ -99,22 +104,27 @@ public final class Unsafe {
 
     /**
      * Fetches a value from a given Java variable.
+     * <p>从给定的java变量中获取值</p>
      * More specifically, fetches a field or array element within the given
      * object <code>o</code> at the given offset, or (if <code>o</code> is
      * null) from the memory address whose numerical value is the given
      * offset.
+     * <p>更具体的,在给定的偏移量获取给定字段或数组元素对象o</p>
      * <p>
      * The results are undefined unless one of the following cases is true:
+     * 下面案例之一为true，否则结果为undefined
      * <ul>
      * <li>The offset was obtained from {@link #objectFieldOffset} on
      * the {@link java.lang.reflect.Field} of some Java field and the object
      * referred to by <code>o</code> is of a class compatible with that
      * field's class.
+     * <p>偏移量是从某个Java字段的字段上的objectFieldOffset获得的，o引用的对象是与该字段的类兼容的类</p>
      *
      * <li>The offset and object reference <code>o</code> (either null or
      * non-null) were both obtained via {@link #staticFieldOffset}
      * and {@link #staticFieldBase} (respectively) from the
      * reflective {@link Field} representation of some Java field.
+     * <p>偏移量和对象引用o (null或非null)都是通过staticFieldOffset和staticFieldBase(分别)从某个Java字段的反射字段表示中获得的</p>
      *
      * <li>The object referred to by <code>o</code> is an array, and the offset
      * is an integer of the form <code>B+N*S</code>, where <code>N</code> is
@@ -122,7 +132,7 @@ public final class Unsafe {
      * the values obtained by {@link #arrayBaseOffset} and {@link
      * #arrayIndexScale} (respectively) from the array's class.  The value
      * referred to is the <code>N</code><em>th</em> element of the array.
-     *
+     * <p>o引用的对象是一个数组，偏移量是形式B+N*S的整数，其中N是数组的有效索引，B和S分别是数组类中arrayBaseOffset和arrayIndexScale得到的值。所引用的值是数组的第n个元素。</p>
      * </ul>
      * <p>
      * If one of the above cases is true, the call references a specific Java

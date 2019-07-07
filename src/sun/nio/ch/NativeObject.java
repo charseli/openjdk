@@ -36,6 +36,7 @@ import sun.misc.Unsafe;
 
 /**
  * Proxies for objects that reside in native memory.
+ * 驻留在本机内存中的对象的代理
  */
 
 class NativeObject {                                    // package-private
@@ -397,8 +398,9 @@ class NativeObject {                                    // package-private
      * @return  The page size, in bytes
      */
     static int pageSize() {
-        if (pageSize == -1)
+        if (pageSize == -1) {
             pageSize = unsafe.pageSize();
+        }
         return pageSize;
     }
 

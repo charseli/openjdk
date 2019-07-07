@@ -29,31 +29,40 @@ import java.lang.reflect.*;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Common utility routines used by both java.lang and
-    java.lang.reflect */
+/**
+ * Common utility routines used by both java.lang and
+ * java.lang.reflect
+ */
 
 public class Reflection {
 
-    /** Used to filter out fields and methods from certain classes from public
-        view, where they are sensitive or they may contain VM-internal objects.
-        These Maps are updated very rarely. Rather than synchronize on
-        each access, we use copy-on-write */
-    private static volatile Map<Class<?>,String[]> fieldFilterMap;
-    private static volatile Map<Class<?>,String[]> methodFilterMap;
+    /**
+     * Used to filter out fields and methods from certain classes from public view,
+     * 用于从公共视图中过滤某些字段和方法
+     * where they are sensitive or they may contain VM-internal objects.
+     * 它们比较敏感或它们包含VM内部对象
+     * These Maps are updated very rarely. Rather than synchronize on each access, we use copy-on-write
+     * 该Map很少更新,访问使用copy-on-write而不是synchronize
+     */
+    private static volatile Map<Class<?>, String[]> fieldFilterMap;
+    private static volatile Map<Class<?>, String[]> methodFilterMap;
 
     static {
-        Map<Class<?>,String[]> map = new HashMap<Class<?>,String[]>();
+        Map<Class<?>, String[]> map = new HashMap<Class<?>, String[]>();
         map.put(Reflection.class,
-            new String[] {"fieldFilterMap", "methodFilterMap"});
-        map.put(System.class, new String[] {"security"});
+                new String[]{"fieldFilterMap", "methodFilterMap"});
+        map.put(System.class, new String[]{"security"});
         fieldFilterMap = map;
 
         methodFilterMap = new HashMap<>();
     }
 
-    /** Returns the class of the caller of the method calling this method,
-        ignoring frames associated with java.lang.reflect.Method.invoke()
-        and its implementation. */
+    /**
+     * Returns the class of the caller of the method calling this method,
+     * 返回调用此方法的方法的调用者的类
+     * ignoring frames associated with java.lang.reflect.Method.invoke()
+     * and its implementation.
+     */
     @CallerSensitive
     public static native Class<?> getCallerClass();
 
@@ -65,21 +74,26 @@ public class Reflection {
     @Deprecated
     public static native Class<?> getCallerClass(int depth);
 
-    /** Retrieves the access flags written to the class file. For
-        inner classes these flags may differ from those returned by
-        Class.getModifiers(), which searches the InnerClasses
-        attribute to find the source-level access flags. This is used
-        instead of Class.getModifiers() for run-time access checks due
-        to compatibility reasons; see 4471811. Only the values of the
-        low 13 bits (i.e., a mask of 0x1FFF) are guaranteed to be
-        valid. */
+    /**
+     * Retrieves the access flags written to the class file.
+     * 检索写入类文件的访问标志
+     * For inner classes these flags may differ from those returned by
+     * Class.getModifiers(), which searches the InnerClasses
+     * attribute to find the source-level access flags. This is used
+     * instead of Class.getModifiers() for run-time access checks due
+     * to compatibility reasons; see 4471811. Only the values of the
+     * low 13 bits (i.e., a mask of 0x1FFF) are guaranteed to be
+     * valid.
+     */
     public static native int getClassAccessFlags(Class<?> c);
 
-    /** A quick "fast-path" check to try to avoid getCallerClass()
-        calls. */
+    /**
+     * A quick "fast-path" check to try to avoid getCallerClass() calls.
+     * 一个快速的"fast-path"检查,试图阻止getCallerClass()方法调用.
+     *
+     */
     public static boolean quickCheckMemberAccess(Class<?> memberClass,
-                                                 int modifiers)
-    {
+                                                 int modifiers) {
         return Modifier.isPublic(getClassAccessFlags(memberClass) & modifiers);
     }
 
@@ -87,19 +101,18 @@ public class Reflection {
                                           Class<?> memberClass,
                                           Object target,
                                           int modifiers)
-        throws IllegalAccessException
-    {
+            throws IllegalAccessException {
         if (currentClass == null || memberClass == null) {
             throw new InternalError();
         }
 
         if (!verifyMemberAccess(currentClass, memberClass, target, modifiers)) {
             throw new IllegalAccessException("Class " + currentClass.getName() +
-                                             " can not access a member of class " +
-                                             memberClass.getName() +
-                                             " with modifiers \"" +
-                                             Modifier.toString(modifiers) +
-                                             "\"");
+                    " can not access a member of class " +
+                    memberClass.getName() +
+                    " with modifiers \"" +
+                    Modifier.toString(modifiers) +
+                    "\"");
         }
     }
 
@@ -108,9 +121,8 @@ public class Reflection {
                                              // or method
                                              Class<?> memberClass,
                                              // May be NULL in case of statics
-                                             Object   target,
-                                             int      modifiers)
-    {
+                                             Object target,
+                                             int modifiers) {
         // Verify that currentClass can access a field, method, or
         // constructor of memberClass, where that member's access bits are
         // "modifiers".
@@ -149,7 +161,7 @@ public class Reflection {
         if (!successSoFar && !Modifier.isPrivate(modifiers)) {
             if (!gotIsSameClassPackage) {
                 isSameClassPackage = isSameClassPackage(currentClass,
-                                                        memberClass);
+                        memberClass);
                 gotIsSameClassPackage = true;
             }
 
@@ -183,14 +195,15 @@ public class Reflection {
 
     private static boolean isSameClassPackage(Class<?> c1, Class<?> c2) {
         return isSameClassPackage(c1.getClassLoader(), c1.getName(),
-                                  c2.getClassLoader(), c2.getName());
+                c2.getClassLoader(), c2.getName());
     }
 
-    /** Returns true if two classes are in the same package; classloader
-        and classname information is enough to determine a class's package */
+    /**
+     * Returns true if two classes are in the same package; classloader
+     * and classname information is enough to determine a class's package
+     */
     private static boolean isSameClassPackage(ClassLoader loader1, String name1,
-                                              ClassLoader loader2, String name2)
-    {
+                                              ClassLoader loader2, String name2) {
         if (loader1 != loader2) {
             return false;
         } else {
@@ -237,8 +250,7 @@ public class Reflection {
     }
 
     static boolean isSubclassOf(Class<?> queryClass,
-                                Class<?> ofClass)
-    {
+                                Class<?> ofClass) {
         while (queryClass != null) {
             if (queryClass == ofClass) {
                 return true;
@@ -250,25 +262,25 @@ public class Reflection {
 
     // fieldNames must contain only interned Strings
     public static synchronized void registerFieldsToFilter(Class<?> containingClass,
-                                              String ... fieldNames) {
+                                                           String... fieldNames) {
         fieldFilterMap =
-            registerFilter(fieldFilterMap, containingClass, fieldNames);
+                registerFilter(fieldFilterMap, containingClass, fieldNames);
     }
 
     // methodNames must contain only interned Strings
     public static synchronized void registerMethodsToFilter(Class<?> containingClass,
-                                              String ... methodNames) {
+                                                            String... methodNames) {
         methodFilterMap =
-            registerFilter(methodFilterMap, containingClass, methodNames);
+                registerFilter(methodFilterMap, containingClass, methodNames);
     }
 
-    private static Map<Class<?>,String[]> registerFilter(Map<Class<?>,String[]> map,
-            Class<?> containingClass, String ... names) {
+    private static Map<Class<?>, String[]> registerFilter(Map<Class<?>, String[]> map,
+                                                          Class<?> containingClass, String... names) {
         if (map.get(containingClass) != null) {
             throw new IllegalArgumentException
-                            ("Filter already registered: " + containingClass);
+                    ("Filter already registered: " + containingClass);
         }
-        map = new HashMap<Class<?>,String[]>(map);
+        map = new HashMap<Class<?>, String[]>(map);
         map.put(containingClass, names);
         return map;
     }
@@ -279,7 +291,7 @@ public class Reflection {
             // Bootstrapping
             return fields;
         }
-        return (Field[])filter(fields, fieldFilterMap.get(containingClass));
+        return (Field[]) filter(fields, fieldFilterMap.get(containingClass));
     }
 
     public static Method[] filterMethods(Class<?> containingClass, Method[] methods) {
@@ -287,7 +299,7 @@ public class Reflection {
             // Bootstrapping
             return methods;
         }
-        return (Method[])filter(methods, methodFilterMap.get(containingClass));
+        return (Method[]) filter(methods, methodFilterMap.get(containingClass));
     }
 
     private static Member[] filter(Member[] members, String[] filteredNames) {
@@ -308,7 +320,7 @@ public class Reflection {
             }
         }
         Member[] newMembers =
-            (Member[])Array.newInstance(members[0].getClass(), numNewMembers);
+                (Member[]) Array.newInstance(members[0].getClass(), numNewMembers);
         int destIdx = 0;
         for (Member member : members) {
             boolean shouldSkip = false;
@@ -331,7 +343,7 @@ public class Reflection {
      */
     public static boolean isCallerSensitive(Method m) {
         final ClassLoader loader = m.getDeclaringClass().getClassLoader();
-        if (sun.misc.VM.isSystemDomainLoader(loader) || isExtClassLoader(loader))  {
+        if (sun.misc.VM.isSystemDomainLoader(loader) || isExtClassLoader(loader)) {
             return m.isAnnotationPresent(CallerSensitive.class);
         }
         return false;

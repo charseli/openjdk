@@ -25,16 +25,13 @@
 
 package sun.nio.ch;
 
-import sun.misc.*;
-
-
 /**
  * Manipulates a native array of pollfd structs on Solaris:
- *
+ * <p>
  * typedef struct pollfd {
- *    int fd;
- *    short events;
- *    short revents;
+ * int fd;
+ * short events;
+ * short revents;
  * } pollfd_t;
  *
  * @author Mike McCloskey
@@ -48,6 +45,11 @@ public class PollArrayWrapper extends AbstractPollArrayWrapper {
     // File descriptor to write for interrupt
     int interruptFD;
 
+    /**
+     * 底层使用的UnSafe分配内存.
+     *
+     * @param newSize .
+     */
     PollArrayWrapper(int newSize) {
         newSize = (newSize + 1) * SIZE_POLLFD;
         pollArray = new AllocatedNativeObject(newSize, false);
@@ -87,10 +89,10 @@ public class PollArrayWrapper extends AbstractPollArrayWrapper {
      * the same array.
      */
     static void replaceEntry(PollArrayWrapper source, int sindex,
-                      PollArrayWrapper target, int tindex) {
+                             PollArrayWrapper target, int tindex) {
         target.putDescriptor(tindex, source.getDescriptor(sindex));
         target.putEventOps(tindex, source.getEventOps(sindex));
-        target.putReventOps(tindex, source.getReventOps(sindex));
+        target.getReventOps(tindex, source.getReventOps(sindex));
     }
 
     /**
@@ -104,8 +106,9 @@ public class PollArrayWrapper extends AbstractPollArrayWrapper {
         PollArrayWrapper temp = new PollArrayWrapper(newSize);
 
         // Copy over existing entries
-        for (int i=0; i<totalChannels; i++)
+        for (int i = 0; i < totalChannels; i++) {
             replaceEntry(this, i, temp, i);
+        }
 
         // Swap new array into pollArray field
         pollArray.free();
@@ -113,9 +116,17 @@ public class PollArrayWrapper extends AbstractPollArrayWrapper {
         pollArrayAddress = pollArray.address();
     }
 
+    /**
+     * https://baike.baidu.com/item/poll/3643578?fr=aladdin
+     * 关于poll函数底层介绍.
+     * @param numfds
+     * @param offset
+     * @param timeout
+     * @return
+     */
     int poll(int numfds, int offset, long timeout) {
         return poll0(pollArrayAddress + (offset * SIZE_POLLFD),
-                     numfds, timeout);
+                numfds, timeout);
     }
 
     public void interrupt() {
