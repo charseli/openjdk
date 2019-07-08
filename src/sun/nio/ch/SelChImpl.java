@@ -25,9 +25,9 @@
 
 package sun.nio.ch;
 
-import java.nio.channels.Channel;
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.nio.channels.Channel;
 
 
 /**
@@ -45,20 +45,23 @@ public interface SelChImpl extends Channel {
     /**
      * Adds the specified ops if present in interestOps. The specified
      * ops are turned on without affecting the other ops.
+     * 若出现在interestOps(感兴趣操作中),添加这个特定操作.这个特定操作在不影响其它操作情况下将开启.
      *
-     * @return  true iff the new value of sk.readyOps() set by this method
-     *          contains at least one bit that the previous value did not
-     *          contain
+     * @return true if the new value of sk.readyOps() set by this method
+     * contains at least one bit that the previous value did not
+     * contain
+     * 由sk.readyOps()设置的新值包含至少一位前一个值(ops)不包含的
      */
     public boolean translateAndUpdateReadyOps(int ops, SelectionKeyImpl sk);
 
     /**
      * Sets the specified ops if present in interestOps. The specified
      * ops are turned on, and all other ops are turned off.
+     * 如果在interest Option，则设置指定的操作.这个特定操作在不影响其它操作情况下将开启
      *
-     * @return  true iff the new value of sk.readyOps() set by this method
-     *          contains at least one bit that the previous value did not
-     *          contain
+     * @return true iff the new value of sk.readyOps() set by this method
+     * contains at least one bit that the previous value did not
+     * contain
      */
     public boolean translateAndSetReadyOps(int ops, SelectionKeyImpl sk);
 

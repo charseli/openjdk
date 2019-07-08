@@ -50,10 +50,12 @@ class PipeImpl
         sink = new SinkChannelImpl(sp, sinkfd);
     }
 
+    @Override
     public SourceChannel source() {
         return source;
     }
 
+    @Override
     public SinkChannel sink() {
         return sink;
     }

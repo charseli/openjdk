@@ -31,6 +31,7 @@ import java.nio.ByteBuffer;
 
 /**
  * A channel that can read bytes.
+ * 可读取字节的channel
  *
  * <p> Only one read operation upon a readable channel may be in progress at
  * any given time.  If one thread initiates a read operation upon a channel
@@ -38,6 +39,8 @@ import java.nio.ByteBuffer;
  * block until the first operation is complete.  Whether or not other kinds of
  * I/O operations may proceed concurrently with a read operation depends upon
  * the type of the channel. </p>
+ *<p>在读通道上的任何给定的时间只有一个读操作正在进行.一个线程在channel上开始读操作,其它试图开始另一个读操作的线程将被阻塞,直到第一个操作结束.
+ * 其它种类的I/O操作和读取操作是否可同时开始取决channel类型</p>
  *
  *
  * @author Mark Reinhold
@@ -49,10 +52,12 @@ public interface ReadableByteChannel extends Channel {
 
     /**
      * Reads a sequence of bytes from this channel into the given buffer.
+     * 从该channel种读取字符序列到给定的buffer
      *
      * <p> An attempt is made to read up to <i>r</i> bytes from the channel,
      * where <i>r</i> is the number of bytes remaining in the buffer, that is,
      * <tt>dst.remaining()</tt>, at the moment this method is invoked.
+     * <p>尝试从通道读取到r字节， 其中r为缓冲区中剩余字节数,r为此刻dst.remaining()调用结果</p>
      *
      * <p> Suppose that a byte sequence of length <i>n</i> is read, where
      * <tt>0</tt>&nbsp;<tt>&lt;=</tt>&nbsp;<i>n</i>&nbsp;<tt>&lt;=</tt>&nbsp;<i>r</i>.

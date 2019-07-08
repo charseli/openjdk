@@ -25,28 +25,30 @@
 
 package java.nio.channels;
 
-import java.io.IOException;
 import java.io.Closeable;
+import java.io.IOException;
 
 
 /**
  * A nexus for I/O operations.
+ * 用于I/O操作的连接
  *
  * <p> A channel represents an open connection to an entity such as a hardware
  * device, a file, a network socket, or a program component that is capable of
  * performing one or more distinct I/O operations, for example reading or
  * writing.
+ * <p>channel代表到实体(如计算机硬件驱动、文件、网络连接或者一个有能力执行一个或多个不同的I/O操作如读取或写的程序组件)打开的连接</p>
  *
  * <p> A channel is either open or closed.  A channel is open upon creation,
  * and once closed it remains closed.  Once a channel is closed, any attempt to
  * invoke an I/O operation upon it will cause a {@link ClosedChannelException}
  * to be thrown.  Whether or not a channel is open may be tested by invoking
  * its {@link #isOpen isOpen} method.
- *
+ * <p>channel不是打开就是关闭,channel一经创建就打开,关闭就持续关闭.channel一旦关闭,任何试图执行的I/O操作将报错.channel是否打开可通过调用isOpen()测试</p>
  * <p> Channels are, in general, intended to be safe for multithreaded access
  * as described in the specifications of the interfaces and classes that extend
  * and implement this interface.
- *
+ * <p>一般channel用于多线程访问是安全的,如扩展的接口和类的规范中所述并实现此接口</p>
  *
  * @author Mark Reinhold
  * @author JSR-51 Expert Group
@@ -77,8 +79,9 @@ public interface Channel extends Closeable {
      * the first invocation is complete, after which it will return without
      * effect. </p>
      *
-     * @throws  IOException  If an I/O error occurs
+     * @throws IOException If an I/O error occurs
      */
+    @Override
     public void close() throws IOException;
 
 }
